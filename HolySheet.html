@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Holy Sheet!</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+        }
+
+        /* TOP BAR */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+            margin-bottom: 10px;
+            flex-shrink: 0;
+            height: 50px;
+        }
+
+        .year-selector select {
+            font-size: 18px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            background: #fafafa;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 80px;
+            text-align: center;
+            height: 30px;
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .year-input {
+            font-size: 18px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            background: #fafafa;
+            width: 80px;
+            text-align: center;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            height: 30px;
+            padding: 0 10px;
+        }
+        .year-input::-webkit-outer-spin-button,
+        .year-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .year-input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .today-btn {
+            padding: 0 10px;
+            font-size: 18px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            background: #fafafa;
+            cursor: pointer;
+            user-select: none;
+            transition: 0.1s;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .today-btn:hover {
+            background: #e8e8e8;
+        }
+
+        @media (max-width: 768px) {
+            .today-btn {
+                font-size: 14px;
+            }
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            font-size: 30px;
+            cursor: pointer;
+            user-select: none;
+            transition: 0.1s;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-btn:hover {
+            transform: scale(1.15);
+        }
+
+        .total-hours {
+            font-size: 18px;
+            padding: 0 10px;
+            border-radius: 6px;
+            background: #fafafa;
+            border: 1px solid #ddd;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* CALENDAR LAYOUT */
+        .calendar-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow: hidden;
+        }
+        .calendar-container {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 6px;
+            flex: 1;
+            overflow: hidden;
+        }
+        .month-hours-row {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 6px;
+        }
+
+        .month {
+            background-color: white;
+            border-radius: 8px;
+            padding: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .month-name {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 2px;
+            font-size: 10px;
+        }
+
+        .days-grid { display: flex; flex-direction: column; gap: 1px; flex: 1; }
+        .day {
+            height: calc((100% - 30px) / 31);
+            display: flex; justify-content: center; align-items: center;
+            border: 1px solid #ddd;
+            background: #fafafa;
+            font-size: 9px;
+            cursor: pointer;
+            position: relative;
+        }
+        .day:hover { background-color: #e0e0e0; }
+        .day.has-data { background: #4CAF50; color: white; font-weight: bold; }
+        .day.weekend { background: #e8e8e8; }
+        .day.weekend.has-data { background: #45a049; }
+        .day.empty { background: #efefef; cursor: default; }
+        .day.today { background: #e3f2fd; }
+        .day.today.has-data { background: #42a5f5; }
+
+        .day-tooltip {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            font-size: 14px;
+            white-space: nowrap;
+            z-index: 1000;
+            margin-bottom: 4px;
+            pointer-events: none;
+            min-width: max-content;
+        }
+        .day:hover .day-tooltip {
+            display: block;
+        }
+
+        .month-hours-box {
+            background: white;
+            border-radius: 8px;
+            padding: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 30px;
+            font-size: 18px;
+        }
+
+        /* DROPDOWN MENU */
+        #dropdownMenu {
+            display: none;
+            position: absolute;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            overflow: hidden;
+            min-width: max-content;
+            transform: translateX(-50%);
+        }
+        .dropdown-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            transition: background 0.1s;
+            touch-action: manipulation;
+        }
+        .dropdown-item:hover {
+            background: #f0f0f0;
+        }
+        .dropdown-item:active {
+            background: #e0e0e0;
+        }
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        .dropdown-item select {
+            width: 100%;
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background: #fafafa;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .dropdown-item {
+                padding: 12px 20px;
+                font-size: 16px;
+            }
+        }
+
+        /* CUSTOM INPUT MODAL */
+        #customModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        #customModalContent {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 260px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        #customModalContent input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        #customModalContent button {
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        #customModalContent button:first-of-type {
+            background: #4CAF50;
+            color: white;
+        }
+        #customModalContent button:last-of-type {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP BAR ROW BOX -->
+    <div class="top-bar">
+
+        <!-- YEAR SELECTOR -->
+        <div class="year-selector" style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:30px; height: 30px; display: flex; align-items: center; justify-content: center;">📅</span>
+            <select id="yearSelect" onchange="selectYear()" ondblclick="switchToInput()"></select>
+            <input type="number" id="yearInput" class="year-input" value="2025" onchange="changeYear()" onblur="hideYearInput()" min="1900" max="2200" style="display:none;">
+        </div>
+
+        <!-- TODAY BUTTON -->
+        <div class="today-btn" onclick="goToToday()" id="todayBtn">
+            📍 Today
+        </div>
+
+        <!-- CONTROLS -->
+        <div class="controls">
+
+            <div class="total-hours" id="totalHours">Total: 0h</div>
+
+            <span class="icon-btn" onclick="clearXML()">🔄</span>
+            <span class="icon-btn" onclick="document.getElementById('fileInput').click()">⬆️</span>
+            <span class="icon-btn" onclick="saveToXML()">⬇️</span>
+
+            <input type="file" id="fileInput" accept=".xml" onchange="loadFromXML(event)" style="display:none;">
+        </div>
+
+    </div>
+
+    <div class="calendar-wrapper">
+        <div class="calendar-container" id="calendarContainer"></div>
+        <div class="month-hours-row" id="monthHoursRow"></div>
+    </div>
+
+    <!-- DROPDOWN MENU -->
+    <div id="dropdownMenu">
+        <div class="dropdown-item">
+            <select id="timeSelector" onchange="updateTimeOfDay()">
+                <option value="morning">Morning</option>
+                <option value="afternoon">Afternoon</option>
+                <option value="night">Night</option>
+            </select>
+        </div>
+        <div class="dropdown-item" onclick="setHours(8)">8 H</div>
+        <div class="dropdown-item" onclick="setHours(12)">12 H</div>
+        <div class="dropdown-item" onclick="openCustomInput()">Custom</div>
+        <div class="dropdown-item" onclick="clearDay()">Clear</div>
+        <div class="dropdown-item" onclick="closeDropdown()">Cancel</div>
+    </div>
+
+    <!-- CUSTOM INPUT MODAL -->
+    <div id="customModal">
+        <div id="customModalContent">
+            <h3>Enter Custom Hours</h3>
+            <input id="customHours" type="number" step="0.1" placeholder="Hours">
+            <button onclick="saveCustomHours()">Save</button>
+            <button onclick="closeCustomModal()">Cancel</button>
+        </div>
+    </div>
+
+<script>
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    let year = new Date().getFullYear();
+    let dayData = {};
+    let currentEditingDay = null;
+
+    function getDaysInMonth(m,y){return new Date(y,m+1,0).getDate();}
+    function isWeekend(y,m,d){return [0,6].includes(new Date(y,m,d).getDay());}
+
+    function initYearInput() {
+        const cy = new Date().getFullYear();
+        const sel = document.getElementById("yearSelect");
+        for (let y = cy-50; y <= cy+50; y++){
+            const o = document.createElement("option");
+            o.value = y;
+            o.textContent = y;
+            if (y === year) o.selected = true;
+            sel.appendChild(o);
+        }
+        document.getElementById("yearInput").value = year;
+        updateTodayButton();
+    }
+
+    function selectYear() {
+        year = parseInt(document.getElementById("yearSelect").value);
+        document.getElementById("yearInput").value = year;
+        createCalendar();
+    }
+
+    function switchToInput() {
+        document.getElementById("yearSelect").style.display = "none";
+        document.getElementById("yearInput").style.display = "block";
+        document.getElementById("yearInput").focus();
+        document.getElementById("yearInput").select();
+    }
+
+    function hideYearInput() {
+        setTimeout(() => {
+            document.getElementById("yearInput").style.display = "none";
+            document.getElementById("yearSelect").style.display = "block";
+        }, 150);
+    }
+
+    function updateTodayButton() {
+        const today = new Date();
+        const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const dayName = dayNames[today.getDay()];
+        const monthName = monthNames[today.getMonth()];
+        const day = today.getDate();
+
+        // Check screen width and format accordingly
+        const btn = document.getElementById("todayBtn");
+        if (window.innerWidth < 768) {
+            // Mobile: shorter format
+            btn.textContent = `📍 ${monthName.substring(0, 3)} ${day}`;
+        } else if (window.innerWidth < 1024) {
+            // Tablet: medium format
+            btn.textContent = `📍 ${dayName.substring(0, 3)}, ${monthName.substring(0, 3)} ${day}`;
+        } else {
+            // Desktop: full format
+            btn.textContent = `📍 ${dayName}, ${monthName} ${day}`;
+        }
+    }
+
+    function changeYear(){
+        year = parseInt(document.getElementById("yearInput").value);
+        if(isNaN(year) || year < 1900 || year > 2200) {
+            year = new Date().getFullYear();
+        }
+        document.getElementById("yearInput").value = year;
+        document.getElementById("yearSelect").value = year;
+        createCalendar();
+    }
+
+    function goToToday(){
+        year = new Date().getFullYear();
+        document.getElementById("yearInput").value = year;
+        document.getElementById("yearSelect").value = year;
+        createCalendar();
+    }
+
+    function calculateMonthHours(m){
+        let t=0;
+        const days=getDaysInMonth(m,year);
+        for(let d=1;d<=days;d++){
+            const k=`${year}-${m}-${d}`;
+            if(dayData[k]?.hours) t+=parseFloat(dayData[k].hours);
+        }
+        return t;
+    }
+
+    function calculateTotalHours(){
+        let t=0; for(let m=0;m<12;m++) t+=calculateMonthHours(m);
+        return t;
+    }
+
+    function updateHoursDisplay(){
+        const t=calculateTotalHours();
+        document.getElementById("totalHours").textContent=`Total: ${t.toFixed(1)}h`;
+    }
+
+    function createCalendar(){
+        const c=document.getElementById("calendarContainer");
+        const r=document.getElementById("monthHoursRow");
+        c.innerHTML=""; r.innerHTML="";
+
+        for (let m=0;m<12;m++){
+            const mDiv=document.createElement("div");
+            mDiv.className="month";
+
+            const name=document.createElement("div");
+            name.className="month-name";
+            name.textContent=monthNames[m];
+            mDiv.appendChild(name);
+
+            const grid=document.createElement("div");
+            grid.className="days-grid";
+            const days=getDaysInMonth(m,year);
+
+            for(let d=1;d<=31;d++){
+                const dd=document.createElement("div");
+                dd.className="day";
+
+                if(d<=days){
+                    dd.textContent=d;
+                    dd.onclick=()=>openModal(m,d);
+
+                    const k=`${year}-${m}-${d}`;
+                    if(dayData[k]) {
+                        dd.classList.add("has-data");
+
+                        // Add tooltip with day info
+                        const tooltip = document.createElement("div");
+                        tooltip.className = "day-tooltip";
+                        const timeOfDay = dayData[k].timeOfDay || "";
+                        const hours = dayData[k].hours || "";
+                        tooltip.textContent = `${timeOfDay ? timeOfDay.charAt(0).toUpperCase() + timeOfDay.slice(1) : ""}: ${hours}h`;
+                        dd.appendChild(tooltip);
+                    }
+                    if(isWeekend(year,m,d)) dd.classList.add("weekend");
+
+                    // Highlight today
+                    const today = new Date();
+                    if(year === today.getFullYear() && m === today.getMonth() && d === today.getDate()){
+                        dd.classList.add("today");
+                    }
+                } else {
+                    dd.classList.add("empty");
+                }
+
+                grid.appendChild(dd);
+            }
+
+            mDiv.appendChild(grid);
+            c.appendChild(mDiv);
+
+            const hBox=document.createElement("div");
+            hBox.className="month-hours-box";
+            hBox.textContent=`${calculateMonthHours(m).toFixed(1)}h`;
+            r.appendChild(hBox);
+        }
+
+        updateHoursDisplay();
+    }
+
+    function openModal(m,d){
+        currentEditingDay={month:m,day:d};
+        const k=`${year}-${m}-${d}`;
+        const data=dayData[k]||{};
+
+        // Set time selector to existing value or default to morning
+        const timeSelect = document.getElementById("timeSelector");
+        timeSelect.value = data.timeOfDay || "morning";
+
+        // Position dropdown below clicked day (centered)
+        const dropdown = document.getElementById("dropdownMenu");
+        const dayElement = event.target;
+        const rect = dayElement.getBoundingClientRect();
+
+        // Center the dropdown horizontally on the clicked box
+        dropdown.style.left = (rect.left + rect.width / 2) + "px";
+        dropdown.style.top = (rect.bottom + 2) + "px";
+
+        // Try to match the day box width, but allow natural sizing
+        const dayWidth = rect.width;
+        dropdown.style.minWidth = dayWidth + "px";
+        dropdown.style.maxWidth = Math.max(dayWidth, 150) + "px";
+
+        dropdown.style.display = "block";
+    }
+
+    function closeDropdown(){
+        document.getElementById("dropdownMenu").style.display="none";
+        currentEditingDay=null;
+    }
+
+    function updateTimeOfDay(){
+        if(!currentEditingDay) return;
+        const k=`${year}-${currentEditingDay.month}-${currentEditingDay.day}`;
+        if(!dayData[k]) dayData[k]={timeOfDay:"morning",hours:"0"};
+        dayData[k].timeOfDay = document.getElementById("timeSelector").value;
+    }
+
+    function setHours(hours){
+        if(!currentEditingDay) return;
+        const k=`${year}-${currentEditingDay.month}-${currentEditingDay.day}`;
+        const timeOfDay = document.getElementById("timeSelector").value;
+        dayData[k]={timeOfDay:timeOfDay,hours:hours.toString()};
+        createCalendar();
+        closeDropdown();
+    }
+
+    function openCustomInput(){
+        document.getElementById("customModal").style.display="flex";
+        document.getElementById("customHours").value="";
+        document.getElementById("customHours").focus();
+    }
+
+    function closeCustomModal(){
+        document.getElementById("customModal").style.display="none";
+    }
+
+    function saveCustomHours(){
+        const hours = document.getElementById("customHours").value;
+        if(!hours || !currentEditingDay) return;
+        const k=`${year}-${currentEditingDay.month}-${currentEditingDay.day}`;
+        const timeOfDay = document.getElementById("timeSelector").value;
+        dayData[k]={timeOfDay:timeOfDay,hours:hours};
+        createCalendar();
+        closeCustomModal();
+        closeDropdown();
+    }
+
+    function clearDay(){
+        if(!currentEditingDay) return;
+        const k=`${year}-${currentEditingDay.month}-${currentEditingDay.day}`;
+        delete dayData[k];
+        createCalendar();
+        closeDropdown();
+    }
+
+    /* SAVE XML */
+    function saveToXML(){
+        let xmlString = '<?xml version="1.0" encoding="UTF-8"?>\n<DayData>\n';
+
+        for(const key in dayData){
+            xmlString += `  <Entry key="${key}">\n`;
+            xmlString += `    <TimeOfDay>${dayData[key].timeOfDay||""}</TimeOfDay>\n`;
+            xmlString += `    <Hours>${dayData[key].hours||""}</Hours>\n`;
+            xmlString += `  </Entry>\n`;
+        }
+
+        xmlString += '</DayData>';
+
+        const blob=new Blob([xmlString],{type:"text/xml"});
+        const url=URL.createObjectURL(blob);
+
+        const a=document.createElement("a");
+        a.href=url;
+        a.download=`HolySheet_${year}.xml`;
+        a.click();
+
+        URL.revokeObjectURL(url);
+    }
+
+    /* LOAD XML */
+    function loadFromXML(e){
+        const file=e.target.files[0];
+        if(!file) return;
+
+        const reader=new FileReader();
+        reader.onload=function(ev){
+            const parser=new DOMParser();
+            const xml=parser.parseFromString(ev.target.result,"text/xml");
+
+            const entries=xml.getElementsByTagName("Entry");
+            dayData={};
+
+            for(let i=0;i<entries.length;i++){
+                const key=entries[i].getAttribute("key");
+                const tod=entries[i].getElementsByTagName("TimeOfDay")[0]?.textContent||"";
+                const hrs=entries[i].getElementsByTagName("Hours")[0]?.textContent||"";
+                dayData[key]={timeOfDay:tod,hours:hrs};
+            }
+
+            createCalendar();
+        };
+        reader.readAsText(file);
+    }
+
+    /* CLEAR XML */
+    function clearXML(){
+        if(!confirm("Clear ALL saved hours?")) return;
+        dayData={};
+        createCalendar();
+    }
+
+    window.onclick=function(e){
+        const dropdown = document.getElementById("dropdownMenu");
+        const customModal = document.getElementById("customModal");
+        if(!dropdown.contains(e.target) && !e.target.classList.contains('day')){
+            closeDropdown();
+        }
+        if(e.target === customModal){
+            closeCustomModal();
+        }
+    }
+
+    // Update today button on resize
+    window.addEventListener('resize', updateTodayButton);
+
+    initYearInput();
+    createCalendar();
+</script>
+
+</body>
+</html>
