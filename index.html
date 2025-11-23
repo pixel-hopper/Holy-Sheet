@@ -4,15 +4,125 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Holy Sheet!</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij4KICA8dGV4dCB4PSIwIiB5PSI1MCIgZm9udC1zaXplPSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIj7wn5OFPC90ZXh0Pgo8L3N2Zz4K">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; overflow: hidden; }
+        
+        /* Light theme (default) */
         body {
             font-family: Arial, sans-serif;
             background-color: #f5f5f5;
             display: flex;
             flex-direction: column;
             padding: 10px;
+            color: #333;
+        }
+
+        /* Dark theme */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1a1a1a;
+                color: #e0e0e0;
+            }
+            
+            .top-bar {
+                background: #2d2d2d !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+            }
+            
+            .year-selector select,
+            .year-input,
+            .today-btn,
+            .total-hours {
+                background: #3a3a3a !important;
+                border-color: #555 !important;
+                color: #e0e0e0 !important;
+            }
+            
+            .today-btn:hover {
+                background: #4a4a4a !important;
+            }
+            
+            .month {
+                background-color: #2d2d2d !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+            }
+            
+            .day {
+                border-color: #555 !important;
+                background: #3a3a3a !important;
+                color: #e0e0e0 !important;
+            }
+            
+            .day:hover {
+                background-color: #4a4a4a !important;
+            }
+            
+            .day.weekend {
+                background: #333 !important;
+            }
+            
+            .day.empty {
+                background: #2a2a2a !important;
+            }
+            
+            .day.today {
+                background: #1e3a5f !important;
+            }
+            
+            .month-hours-box {
+                background: #2d2d2d !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+                color: #e0e0e0 !important;
+            }
+            
+            .day-tooltip {
+                background: #2d2d2d !important;
+                color: #e0e0e0 !important;
+                border-color: #555 !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.6) !important;
+            }
+            
+            #dropdownMenu {
+                background: #2d2d2d !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.6) !important;
+            }
+            
+            .dropdown-item {
+                border-bottom-color: #444 !important;
+                color: #e0e0e0 !important;
+            }
+            
+            .dropdown-item:hover {
+                background: #3a3a3a !important;
+            }
+            
+            .dropdown-item:active {
+                background: #4a4a4a !important;
+            }
+            
+            .dropdown-item select {
+                background: #3a3a3a !important;
+                border-color: #555 !important;
+                color: #e0e0e0 !important;
+            }
+            
+            #customModalContent {
+                background: #2d2d2d !important;
+                color: #e0e0e0 !important;
+            }
+            
+            #customModalContent input {
+                background: #3a3a3a !important;
+                border-color: #555 !important;
+                color: #e0e0e0 !important;
+            }
+            
+            #customModalContent button:last-of-type {
+                background: #3a3a3a !important;
+                color: #e0e0e0 !important;
+            }
         }
 
         /* TOP BAR */
@@ -569,11 +679,11 @@
 
         // Center the dropdown horizontally on the clicked box
         dropdown.style.left = (rect.left + rect.width / 2) + "px";
-
+        
         // Check if there's enough space below, otherwise show above
         const dropdownHeight = 250; // Approximate height of dropdown
         const spaceBelow = window.innerHeight - rect.bottom;
-
+        
         if (spaceBelow < dropdownHeight) {
             // Show above the day box
             dropdown.style.top = "auto";
