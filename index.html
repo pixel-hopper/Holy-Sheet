@@ -19,7 +19,261 @@
             color: #333;
         }
 
-        /* Dark theme */
+        /* Dark theme - system preference */
+        @media (prefers-color-scheme: dark) {
+            body:not(.force-light) {
+                background-color: #1a1a1a;
+                color: #e0e0e0;
+            }
+            
+            body:not(.force-light) .top-bar {
+                background: #2d2d2d !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+            }
+            
+            body:not(.force-light) .year-selector select,
+            body:not(.force-light) .year-input,
+            body:not(.force-light) .today-btn,
+            body:not(.force-light) .total-hours {
+                background: #3a3a3a !important;
+                border-color: #555 !important;
+                color: #e0e0e0 !important;
+            }
+            
+            body:not(.force-light) .today-btn:hover {
+                background: #4a4a4a !important;
+            }
+            
+            body:not(.force-light) .month {
+                background-color: #2d2d2d !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+            }
+            
+            body:not(.force-light) .day {
+                border-color: #555 !important;
+                background: #3a3a3a !important;
+                color: #e0e0e0 !important;
+            }
+            
+            body:not(.force-light) .day:hover {
+                background-color: #4a4a4a !important;
+            }
+            
+            body:not(.force-light) .day.weekend {
+                background: #333 !important;
+            }
+            
+            body:not(.force-light) .day.empty {
+                background: #2a2a2a !important;
+            }
+            
+            body:not(.force-light) .day.today {
+                background: #1e3a5f !important;
+            }
+            
+            body:not(.force-light) .day.has-data {
+                background: #4CAF50 !important;
+                color: white !important;
+            }
+            
+            body:not(.force-light) .day.weekend.has-data {
+                background: #45a049 !important;
+            }
+            
+            body:not(.force-light) .day.today.has-data {
+                background: #42a5f5 !important;
+            }
+            
+            body:not(.force-light) .day.free-day {
+                background: #FFB84D !important;
+                color: white !important;
+            }
+            
+            body:not(.force-light) .day.free-day.weekend {
+                background: #FF9F1C !important;
+            }
+            
+            body:not(.force-light) .month-hours-box {
+                background: #2d2d2d !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+                color: #e0e0e0 !important;
+            }
+            
+            body:not(.force-light) .day-tooltip {
+                background: #2d2d2d !important;
+                color: #e0e0e0 !important;
+                border-color: #555 !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.6) !important;
+            }
+            
+            body:not(.force-light) #dropdownMenu {
+                background: #2d2d2d !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.6) !important;
+            }
+            
+            body:not(.force-light) .dropdown-item {
+                border-bottom-color: #444 !important;
+                color: #e0e0e0 !important;
+            }
+            
+            body:not(.force-light) .dropdown-item:hover {
+                background: #3a3a3a !important;
+            }
+            
+            body:not(.force-light) .dropdown-item:active {
+                background: #4a4a4a !important;
+            }
+            
+            body:not(.force-light) .dropdown-item select {
+                background: #3a3a3a !important;
+                border-color: #555 !important;
+                color: #e0e0e0 !important;
+            }
+            
+            body:not(.force-light) #customModalContent {
+                background: #2d2d2d !important;
+                color: #e0e0e0 !important;
+            }
+            
+            body:not(.force-light) #customModalContent input {
+                background: #3a3a3a !important;
+                border-color: #555 !important;
+                color: #e0e0e0 !important;
+            }
+            
+            body:not(.force-light) #customModalContent button:last-of-type {
+                background: #3a3a3a !important;
+                color: #e0e0e0 !important;
+            }
+        }
+
+        /* Force dark theme */
+        body.force-dark {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        
+        body.force-dark .top-bar {
+            background: #2d2d2d !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+        }
+        
+        body.force-dark .year-selector select,
+        body.force-dark .year-input,
+        body.force-dark .today-btn,
+        body.force-dark .total-hours {
+            background: #3a3a3a !important;
+            border-color: #555 !important;
+            color: #e0e0e0 !important;
+        }
+        
+        body.force-dark .today-btn:hover {
+            background: #4a4a4a !important;
+        }
+        
+        body.force-dark .month {
+            background-color: #2d2d2d !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+        }
+        
+        body.force-dark .day {
+            border-color: #555 !important;
+            background: #3a3a3a !important;
+            color: #e0e0e0 !important;
+        }
+        
+        body.force-dark .day:hover {
+            background-color: #4a4a4a !important;
+        }
+        
+        body.force-dark .day.weekend {
+            background: #333 !important;
+        }
+        
+        body.force-dark .day.empty {
+            background: #2a2a2a !important;
+        }
+        
+        body.force-dark .day.today {
+            background: #1e3a5f !important;
+        }
+        
+        body.force-dark .day.has-data {
+            background: #4CAF50 !important;
+            color: white !important;
+        }
+        
+        body.force-dark .day.weekend.has-data {
+            background: #45a049 !important;
+        }
+        
+        body.force-dark .day.today.has-data {
+            background: #42a5f5 !important;
+        }
+        
+        body.force-dark .day.free-day {
+            background: #FFB84D !important;
+            color: white !important;
+        }
+        
+        body.force-dark .day.free-day.weekend {
+            background: #FF9F1C !important;
+        }
+        
+        body.force-dark .month-hours-box {
+            background: #2d2d2d !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+            color: #e0e0e0 !important;
+        }
+        
+        body.force-dark .day-tooltip {
+            background: #2d2d2d !important;
+            color: #e0e0e0 !important;
+            border-color: #555 !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6) !important;
+        }
+        
+        body.force-dark #dropdownMenu {
+            background: #2d2d2d !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6) !important;
+        }
+        
+        body.force-dark .dropdown-item {
+            border-bottom-color: #444 !important;
+            color: #e0e0e0 !important;
+        }
+        
+        body.force-dark .dropdown-item:hover {
+            background: #3a3a3a !important;
+        }
+        
+        body.force-dark .dropdown-item:active {
+            background: #4a4a4a !important;
+        }
+        
+        body.force-dark .dropdown-item select {
+            background: #3a3a3a !important;
+            border-color: #555 !important;
+            color: #e0e0e0 !important;
+        }
+        
+        body.force-dark #customModalContent {
+            background: #2d2d2d !important;
+            color: #e0e0e0 !important;
+        }
+        
+        body.force-dark #customModalContent input {
+            background: #3a3a3a !important;
+            border-color: #555 !important;
+            color: #e0e0e0 !important;
+        }
+        
+        body.force-dark #customModalContent button:last-of-type {
+            background: #3a3a3a !important;
+            color: #e0e0e0 !important;
+        }
+
+        /* Original dark theme media query */
         @media (prefers-color-scheme: dark) {
             body {
                 background-color: #1a1a1a;
@@ -461,6 +715,7 @@
             <div class="total-hours" id="freeDays">Free: 0d</div>
             <div class="total-hours" id="totalHours">Total: 0h</div>
 
+            <span class="icon-btn" onclick="toggleTheme()">💡</span>
             <span class="icon-btn" onclick="clearXML()">🔄</span>
             <span class="icon-btn" onclick="document.getElementById('fileInput').click()">⬆️</span>
             <span class="icon-btn" onclick="saveToXML()">⬇️</span>
@@ -507,6 +762,32 @@
     let year = new Date().getFullYear();
     let dayData = {};
     let currentEditingDay = null;
+
+    // Theme management
+    function toggleTheme() {
+        const body = document.body;
+        if (body.classList.contains('force-dark')) {
+            body.classList.remove('force-dark');
+            body.classList.add('force-light');
+            localStorage.setItem('theme', 'light');
+        } else if (body.classList.contains('force-light')) {
+            body.classList.remove('force-light');
+            localStorage.setItem('theme', 'auto');
+        } else {
+            body.classList.add('force-dark');
+            localStorage.setItem('theme', 'dark');
+        }
+    }
+
+    // Load saved theme preference
+    function loadTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('force-dark');
+        } else if (savedTheme === 'light') {
+            document.body.classList.add('force-light');
+        }
+    }
 
     function getDaysInMonth(m,y){return new Date(y,m+1,0).getDate();}
     function isWeekend(y,m,d){return [0,6].includes(new Date(y,m,d).getDay());}
@@ -855,6 +1136,7 @@
     // Update today button on resize
     window.addEventListener('resize', updateTodayButton);
 
+    loadTheme();
     initYearInput();
     createCalendar();
 </script>
