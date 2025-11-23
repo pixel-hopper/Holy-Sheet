@@ -769,23 +769,17 @@
         if (body.classList.contains('force-dark')) {
             body.classList.remove('force-dark');
             body.classList.add('force-light');
-            localStorage.setItem('theme', 'light');
         } else if (body.classList.contains('force-light')) {
             body.classList.remove('force-light');
-            localStorage.setItem('theme', 'auto');
-        } else {
             body.classList.add('force-dark');
-            localStorage.setItem('theme', 'dark');
-        }
-    }
-
-    // Load saved theme preference
-    function loadTheme() {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.body.classList.add('force-dark');
-        } else if (savedTheme === 'light') {
-            document.body.classList.add('force-light');
+        } else {
+            // Check current system theme and toggle opposite
+            const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (isDarkMode) {
+                body.classList.add('force-light');
+            } else {
+                body.classList.add('force-dark');
+            }
         }
     }
 
@@ -1136,7 +1130,6 @@
     // Update today button on resize
     window.addEventListener('resize', updateTodayButton);
 
-    loadTheme();
     initYearInput();
     createCalendar();
 </script>
