@@ -182,6 +182,8 @@
         .day.empty { background: #efefef; cursor: default; }
         .day.today { background: #e3f2fd; }
         .day.today.has-data { background: #42a5f5; }
+        .day.free-day { background: #FFB84D; color: white; font-weight: bold; }
+        .day.free-day.weekend { background: #FF9F1C; }
 
         .day-tooltip {
             display: none;
@@ -324,6 +326,7 @@
         <!-- CONTROLS -->
         <div class="controls">
 
+            <div class="total-hours" id="freeDays">Free: 0d</div>
             <div class="total-hours" id="totalHours">Total: 0h</div>
 
             <span class="icon-btn" onclick="clearXML()">🔄</span>
@@ -352,6 +355,7 @@
         <div class="dropdown-item" onclick="setHours(8)">8 H</div>
         <div class="dropdown-item" onclick="setHours(12)">12 H</div>
         <div class="dropdown-item" onclick="openCustomInput()">Custom</div>
+        <div class="dropdown-item" onclick="setFreeDay()">Free Day</div>
         <div class="dropdown-item" onclick="clearDay()">Clear</div>
         <div class="dropdown-item" onclick="closeDropdown()">Cancel</div>
     </div>
@@ -462,9 +466,19 @@
         return t;
     }
 
+    function calculateFreeDays(){
+        let count=0;
+        for(const key in dayData){
+            if(dayData[key].freeDay) count++;
+        }
+        return count;
+    }
+
     function updateHoursDisplay(){
         const t=calculateTotalHours();
         document.getElementById("totalHours").textContent=`Total: ${t.toFixed(1)}h`;
+        const f=calculateFreeDays();
+        document.getElementById("freeDays").textContent=`Free: ${f}d`;
     }
 
     function createCalendar(){
@@ -495,15 +509,23 @@
 
                     const k=`${year}-${m}-${d}`;
                     if(dayData[k]) {
-                        dd.classList.add("has-data");
-
-                        // Add tooltip with day info
-                        const tooltip = document.createElement("div");
-                        tooltip.className = "day-tooltip";
-                        const timeOfDay = dayData[k].timeOfDay || "";
-                        const hours = dayData[k].hours || "";
-                        tooltip.textContent = `${timeOfDay ? timeOfDay.charAt(0).toUpperCase() + timeOfDay.slice(1) : ""}: ${hours}h`;
-                        dd.appendChild(tooltip);
+                        if(dayData[k].freeDay){
+                            dd.classList.add("free-day");
+                            // Add tooltip for free day
+                            const tooltip = document.createElement("div");
+                            tooltip.className = "day-tooltip";
+                            tooltip.textContent = "Free Day";
+                            dd.appendChild(tooltip);
+                        } else {
+                            dd.classList.add("has-data");
+                            // Add tooltip with day info
+                            const tooltip = document.createElement("div");
+                            tooltip.className = "day-tooltip";
+                            const timeOfDay = dayData[k].timeOfDay || "";
+                            const hours = dayData[k].hours || "";
+                            tooltip.textContent = `${timeOfDay ? timeOfDay.charAt(0).toUpperCase() + timeOfDay.slice(1) : ""}: ${hours}h`;
+                            dd.appendChild(tooltip);
+                        }
                     }
                     if(isWeekend(year,m,d)) dd.classList.add("weekend");
 
@@ -547,7 +569,20 @@
 
         // Center the dropdown horizontally on the clicked box
         dropdown.style.left = (rect.left + rect.width / 2) + "px";
-        dropdown.style.top = (rect.bottom + 2) + "px";
+
+        // Check if there's enough space below, otherwise show above
+        const dropdownHeight = 250; // Approximate height of dropdown
+        const spaceBelow = window.innerHeight - rect.bottom;
+
+        if (spaceBelow < dropdownHeight) {
+            // Show above the day box
+            dropdown.style.top = "auto";
+            dropdown.style.bottom = (window.innerHeight - rect.top + 2) + "px";
+        } else {
+            // Show below the day box
+            dropdown.style.top = (rect.bottom + 2) + "px";
+            dropdown.style.bottom = "auto";
+        }
 
         // Try to match the day box width, but allow natural sizing
         const dayWidth = rect.width;
@@ -574,6 +609,14 @@
         const k=`${year}-${currentEditingDay.month}-${currentEditingDay.day}`;
         const timeOfDay = document.getElementById("timeSelector").value;
         dayData[k]={timeOfDay:timeOfDay,hours:hours.toString()};
+        createCalendar();
+        closeDropdown();
+    }
+
+    function setFreeDay(){
+        if(!currentEditingDay) return;
+        const k=`${year}-${currentEditingDay.month}-${currentEditingDay.day}`;
+        dayData[k]={freeDay:true};
         createCalendar();
         closeDropdown();
     }
@@ -615,6 +658,7 @@
             xmlString += `  <Entry key="${key}">\n`;
             xmlString += `    <TimeOfDay>${dayData[key].timeOfDay||""}</TimeOfDay>\n`;
             xmlString += `    <Hours>${dayData[key].hours||""}</Hours>\n`;
+            xmlString += `    <FreeDay>${dayData[key].freeDay||""}</FreeDay>\n`;
             xmlString += `  </Entry>\n`;
         }
 
@@ -648,7 +692,9 @@
                 const key=entries[i].getAttribute("key");
                 const tod=entries[i].getElementsByTagName("TimeOfDay")[0]?.textContent||"";
                 const hrs=entries[i].getElementsByTagName("Hours")[0]?.textContent||"";
+                const free=entries[i].getElementsByTagName("FreeDay")[0]?.textContent||"";
                 dayData[key]={timeOfDay:tod,hours:hrs};
+                if(free === "true") dayData[key].freeDay = true;
             }
 
             createCalendar();
